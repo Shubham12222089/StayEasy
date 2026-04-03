@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pM73a12XZ90=",
+  "dgSpecHash": "PbgEJ7srH10=",
   "success": true,
   "projectFilePath": "C:\\Users\\shubh\\OneDrive\\Desktop\\Sprint\\StayEasy\\AdminService\\AdminService.Application\\AdminService.Application.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\shubh\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.9\\microsoft.aspnetcore.http.abstractions.2.3.9.nupkg.sha512",
-    "C:\\Users\\shubh\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.3.0\\microsoft.aspnetcore.http.features.2.3.0.nupkg.sha512",
-    "C:\\Users\\shubh\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

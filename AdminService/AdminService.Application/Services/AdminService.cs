@@ -17,4 +17,9 @@ public class AdminService : IAdminService
     {
         return await _bookingClient.GetAllBookings();
     }
+
+    public async Task UpdateBookingStatusAsync(int bookingId, string status)
+    {
+        await _bookingClient.UpdateBookingStatus(bookingId, status);
+    }
 }

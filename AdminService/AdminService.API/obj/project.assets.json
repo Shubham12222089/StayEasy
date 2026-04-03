@@ -257,7 +257,10 @@
         },
         "runtime": {
           "bin/placeholder/AdminService.Infrastructure.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },

@@ -12,4 +12,6 @@ public interface IBookingService
     Task<List<Booking>> GetUserBookingsAsync(int userId);
 
     Task<List<Booking>> GetAllBookingsAsync();
+
+    Task UpdateBookingStatusAsync(int bookingId, string status);
 }

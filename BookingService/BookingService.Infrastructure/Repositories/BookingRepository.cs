@@ -51,4 +51,9 @@ public class BookingRepository
     {
         return await _context.Bookings.ToListAsync();
     }
+
+    public async Task<Booking?> GetBookingById(int id)
+    {
+        return await _context.Bookings.FindAsync(id);
+    }
 }

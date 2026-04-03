@@ -50,9 +50,17 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "MMLib.SwaggerForOcelot": {
+              "target": "Package",
+              "version": "[10.0.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[10.0.5, )"
+            },
+            "Ocelot": {
+              "target": "Package",
+              "version": "[24.1.0, )"
             }
           },
           "imports": [

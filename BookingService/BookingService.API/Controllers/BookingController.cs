@@ -51,4 +51,12 @@ public class BookingController : ControllerBase
         var bookings = await _service.GetAllBookingsAsync();
         return Ok(bookings);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, UpdateBookingStatusRequest request)
+    {
+        await _service.UpdateBookingStatusAsync(id, request.Status);
+        return Ok("Status updated");
+    }
 }

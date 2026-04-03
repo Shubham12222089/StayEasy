@@ -58,4 +58,16 @@ public class BookingService : IBookingService
     {
         return await _repository.GetAllBookingsAsync();
     }
+
+    public async Task UpdateBookingStatusAsync(int bookingId, string status)
+    {
+        var booking = await _repository.GetBookingById(bookingId);
+
+        if (booking == null)
+            throw new Exception("Booking not found");
+
+        booking.Status = status;
+
+        await _repository.SaveChangesAsync();
+    }
 }

@@ -35,4 +35,28 @@ public class BookingClient
 
         return await response.Content.ReadFromJsonAsync<List<BookingSummary>>() ?? new List<BookingSummary>();
     }
+
+    public async Task UpdateBookingStatus(int bookingId, string status)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Put,
+            $"https://localhost:7071/api/booking/{bookingId}/status");
+
+        var token = _httpContextAccessor.HttpContext?
+            .Request.Headers["Authorization"]
+            .ToString();
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", token.Replace("Bearer ", ""));
+        }
+
+        request.Content = JsonContent.Create(new
+        {
+            status = status
+        });
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
 }
