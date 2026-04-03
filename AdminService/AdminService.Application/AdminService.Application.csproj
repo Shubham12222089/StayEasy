@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdminService.Domain\AdminService.Domain.csproj" />
+    <ProjectReference Include="..\AdminService.Infrastructure\AdminService.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
