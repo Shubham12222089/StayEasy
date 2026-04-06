@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "PbgEJ7srH10=",
+  "dgSpecHash": "qGUDy4CRROw=",
   "success": true,
   "projectFilePath": "C:\\Users\\shubh\\OneDrive\\Desktop\\Sprint\\StayEasy\\AdminService\\AdminService.Application\\AdminService.Application.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\shubh\\.nuget\\packages\\rabbitmq.client\\7.2.1\\rabbitmq.client.7.2.1.nupkg.sha512",
+    "C:\\Users\\shubh\\.nuget\\packages\\system.threading.ratelimiting\\8.0.0\\system.threading.ratelimiting.8.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

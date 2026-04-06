@@ -1,6 +1,8 @@
 using AdminService.Application.Interfaces;
 using AdminService.Application.Services;
+using AdminService.Infrastructure.Messaging;
 using AdminService.Infrastructure.Services;
+using AdminService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -74,12 +76,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+var consumer = new BookingCreatedConsumer();
+consumer.StartAsync().GetAwaiter().GetResult();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();

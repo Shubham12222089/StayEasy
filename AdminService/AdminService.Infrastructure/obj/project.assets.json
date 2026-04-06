@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "RabbitMQ.Client/7.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "AdminService.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -15,6 +28,23 @@
     }
   },
   "libraries": {
+    "RabbitMQ.Client/7.0.0": {
+      "sha512": "8YJz22mOSMtkbIVuVSz2HbJwbpKwRoXQ1uqbczDUt1w1Ds8dxFs6dkV/oZ8AlTmkErZjtQelHv+oBu52ud00WA==",
+      "type": "package",
+      "path": "rabbitmq.client/7.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "icon.png",
+        "lib/net8.0/RabbitMQ.Client.dll",
+        "lib/net8.0/RabbitMQ.Client.xml",
+        "lib/netstandard2.0/RabbitMQ.Client.dll",
+        "lib/netstandard2.0/RabbitMQ.Client.xml",
+        "rabbitmq.client.7.0.0.nupkg.sha512",
+        "rabbitmq.client.nuspec"
+      ]
+    },
     "AdminService.Domain/1.0.0": {
       "type": "project",
       "path": "../AdminService.Domain/AdminService.Domain.csproj",
@@ -23,7 +53,8 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "AdminService.Domain >= 1.0.0"
+      "AdminService.Domain >= 1.0.0",
+      "RabbitMQ.Client >= 7.0.0"
     ]
   },
   "packageFolders": {
@@ -79,6 +110,12 @@
     "frameworks": {
       "net10.0": {
         "targetAlias": "net10.0",
+        "dependencies": {
+          "RabbitMQ.Client": {
+            "target": "Package",
+            "version": "[7.0.0, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",

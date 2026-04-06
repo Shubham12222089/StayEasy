@@ -1,9 +1,11 @@
 ﻿using IdentityService.Application.DTOs.Request;
 using IdentityService.Application.DTOs.Response;
+using IdentityService.Application.Exceptions;
 using IdentityService.Application.Interfaces.Services;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace IdentityService.Application.Services;
 
@@ -27,7 +29,7 @@ public class AuthService : IAuthService
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
 
         if (existingUser != null)
-            throw new Exception("User already exists");
+            throw new ApiException("User already exists", StatusCodes.Status400BadRequest);
 
         var user = new User
         {
@@ -55,7 +57,7 @@ public class AuthService : IAuthService
         var user = await _userRepository.GetByEmailAsync(request.Email);
 
         if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
-            throw new Exception("Invalid credentials");
+            throw new ApiException("Invalid credentials", StatusCodes.Status401Unauthorized);
 
         var token = _jwtService.GenerateToken(user);
 

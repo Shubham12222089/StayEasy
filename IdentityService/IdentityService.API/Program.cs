@@ -3,6 +3,7 @@ using IdentityService.Application.Services;
 using IdentityService.Infrastructure.Data;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
+using IdentityService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

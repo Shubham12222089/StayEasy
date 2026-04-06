@@ -139,6 +139,19 @@
           }
         }
       },
+      "RabbitMQ.Client/7.2.1": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -227,7 +240,8 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "AdminService.Domain": "1.0.0",
-          "AdminService.Infrastructure": "1.0.0"
+          "AdminService.Infrastructure": "1.0.0",
+          "RabbitMQ.Client": "7.2.1"
         },
         "compile": {
           "bin/placeholder/AdminService.Application.dll": {}
@@ -250,7 +264,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
-          "AdminService.Domain": "1.0.0"
+          "AdminService.Domain": "1.0.0",
+          "RabbitMQ.Client": "7.0.0"
         },
         "compile": {
           "bin/placeholder/AdminService.Infrastructure.dll": {}
@@ -663,6 +678,23 @@
         "lib/netstandard2.0/Microsoft.OpenApi.xml",
         "microsoft.openapi.1.6.22.nupkg.sha512",
         "microsoft.openapi.nuspec"
+      ]
+    },
+    "RabbitMQ.Client/7.2.1": {
+      "sha512": "YKXEfg9fVQiTKgZlvIhAfPSFaamEgi8DsQmisCH0IAsU4FYLrtoguDrDj6JtJVGUt40QPnBLRH6fTQcAC4qsOg==",
+      "type": "package",
+      "path": "rabbitmq.client/7.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "icon.png",
+        "lib/net8.0/RabbitMQ.Client.dll",
+        "lib/net8.0/RabbitMQ.Client.xml",
+        "lib/netstandard2.0/RabbitMQ.Client.dll",
+        "lib/netstandard2.0/RabbitMQ.Client.xml",
+        "rabbitmq.client.7.2.1.nupkg.sha512",
+        "rabbitmq.client.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore/7.0.0": {

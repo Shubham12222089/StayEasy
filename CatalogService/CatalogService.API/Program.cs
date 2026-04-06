@@ -2,6 +2,7 @@ using CatalogService.Application.Interfaces;
 using CatalogService.Application.Services;
 using CatalogService.Infrastructure.Data;
 using CatalogService.Infrastructure.Repositories;
+using CatalogService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -87,6 +88,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();

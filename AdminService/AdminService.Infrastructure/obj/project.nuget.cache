@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Rgx8nC6j3wM=",
+  "dgSpecHash": "1tx/7GZLQxU=",
   "success": true,
   "projectFilePath": "C:\\Users\\shubh\\OneDrive\\Desktop\\Sprint\\StayEasy\\AdminService\\AdminService.Infrastructure\\AdminService.Infrastructure.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\shubh\\.nuget\\packages\\rabbitmq.client\\7.0.0\\rabbitmq.client.7.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

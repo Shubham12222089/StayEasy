@@ -1,8 +1,10 @@
 using BookingService.Application.Interfaces;
 using BookingService.Application.Services;
 using BookingService.Infrastructure.Data;
+using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
 using BookingService.Infrastructure.Services;
+using BookingService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +21,7 @@ builder.Services.AddHttpClient();
 // 🔹 DI
 builder.Services.AddScoped<IBookingService, BookingService.Application.Services.BookingService>();
 builder.Services.AddScoped<BookingRepository>();
+builder.Services.AddSingleton<RabbitMQPublisher>();
 builder.Services.AddHttpClient<CatalogServiceClient>();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -87,6 +90,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();

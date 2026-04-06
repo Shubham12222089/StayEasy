@@ -1,6 +1,7 @@
 using BookingService.Application.DTOs.Request;
 using BookingService.Application.Interfaces;
 using BookingService.Domain.Entities;
+using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
 using BookingService.Infrastructure.Services;
 
@@ -10,11 +11,13 @@ public class BookingService : IBookingService
 {
     private readonly BookingRepository _repository;
     private readonly CatalogServiceClient _catalogClient;
+    private readonly RabbitMQPublisher _publisher;
 
-    public BookingService(BookingRepository repository, CatalogServiceClient catalogClient)
+    public BookingService(BookingRepository repository, CatalogServiceClient catalogClient, RabbitMQPublisher publisher)
     {
         _repository = repository;
         _catalogClient = catalogClient;
+        _publisher = publisher;
     }
 
     public async Task AddToCartAsync(int userId, AddToCartRequest request)
@@ -47,6 +50,13 @@ public class BookingService : IBookingService
         };
 
         await _repository.AddBookingAsync(booking);
+
+        await _publisher.PublishAsync("booking_created", new
+        {
+            BookingId = booking.Id,
+            UserId = userId,
+            TotalAmount = total
+        });
     }
 
     public async Task<List<Booking>> GetUserBookingsAsync(int userId)
