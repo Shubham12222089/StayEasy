@@ -1,9 +1,11 @@
 using BookingService.Application.DTOs.Request;
+using BookingService.Application.Exceptions;
 using BookingService.Application.Interfaces;
 using BookingService.Domain.Entities;
 using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
 using BookingService.Infrastructure.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace BookingService.Application.Services;
 
@@ -24,13 +26,19 @@ public class BookingService : IBookingService
     {
         var cart = await _repository.GetOrCreateCart(userId);
 
-        var price = await _catalogClient.GetHotelPrice(request.HotelId);
+        var room = await _catalogClient.GetRoomAsync(request.RoomId);
+
+        if (room == null)
+            throw new ApiException("Room not found", StatusCodes.Status404NotFound);
+
+        if (room.AvailableCount < request.Quantity)
+            throw new ApiException("Room not available", StatusCodes.Status400BadRequest);
 
         cart.Items.Add(new CartItem
         {
-            HotelId = request.HotelId,
+            RoomId = request.RoomId,
             Quantity = request.Quantity,
-            Price = price
+            Price = room.Price
         });
 
         await _repository.SaveChangesAsync();
@@ -40,7 +48,15 @@ public class BookingService : IBookingService
     {
         var cart = await _repository.GetOrCreateCart(userId);
 
+        if (cart.Items.Count == 0)
+            throw new ApiException("Cart is empty", StatusCodes.Status400BadRequest);
+
         var total = cart.Items.Sum(i => i.Price * i.Quantity);
+
+        foreach (var item in cart.Items)
+        {
+            await _catalogClient.ReserveRoomAsync(item.RoomId, item.Quantity);
+        }
 
         var booking = new Booking
         {

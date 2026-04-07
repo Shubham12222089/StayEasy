@@ -1087,7 +1087,10 @@
         },
         "runtime": {
           "bin/placeholder/CatalogService.Application.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "CatalogService.Domain/1.0.0": {
         "type": "project",

@@ -2,7 +2,7 @@
 
 public class AddToCartRequest
 {
-    public int HotelId { get; set; }
+    public int RoomId { get; set; }
 
     public int Quantity { get; set; }
 }

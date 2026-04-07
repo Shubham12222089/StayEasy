@@ -28,4 +28,15 @@ public class HotelRepository
     {
         return await _context.Hotels.FindAsync(id);
     }
+
+    public async Task DeleteAsync(Hotel hotel)
+    {
+        _context.Hotels.Remove(hotel);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
 }

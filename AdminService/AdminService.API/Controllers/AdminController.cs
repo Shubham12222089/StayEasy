@@ -30,4 +30,88 @@ public class AdminController : ControllerBase
         await _service.UpdateBookingStatusAsync(id, request.Status);
         return Ok("Booking status updated");
     }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var result = await _service.GetUsersAsync();
+        return Ok(result);
+    }
+
+    [HttpPut("users/{id}/block")]
+    public async Task<IActionResult> BlockUser(int id, [FromBody] UpdateUserBlockRequest request)
+    {
+        await _service.BlockUserAsync(id, request.IsBlocked);
+        return Ok("User updated");
+    }
+
+    [HttpDelete("users/{id}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        await _service.DeleteUserAsync(id);
+        return Ok("User deleted");
+    }
+
+    [HttpGet("hotels")]
+    public async Task<IActionResult> GetHotels()
+    {
+        var result = await _service.GetHotelsAsync();
+        return Ok(result);
+    }
+
+    [HttpPost("hotels")]
+    public async Task<IActionResult> AddHotel([FromBody] object request)
+    {
+        await _service.AddHotelAsync(request);
+        return Ok("Hotel added");
+    }
+
+    [HttpPut("hotels/{id}")]
+    public async Task<IActionResult> UpdateHotel(int id, [FromBody] object request)
+    {
+        await _service.UpdateHotelAsync(id, request);
+        return Ok("Hotel updated");
+    }
+
+    [HttpDelete("hotels/{id}")]
+    public async Task<IActionResult> DeleteHotel(int id)
+    {
+        await _service.DeleteHotelAsync(id);
+        return Ok("Hotel deleted");
+    }
+
+    [HttpGet("rooms/hotel/{hotelId}")]
+    public async Task<IActionResult> GetRoomsByHotel(int hotelId)
+    {
+        var result = await _service.GetRoomsByHotelAsync(hotelId);
+        return Ok(result);
+    }
+
+    [HttpPost("rooms")]
+    public async Task<IActionResult> AddRoom([FromBody] object request)
+    {
+        await _service.AddRoomAsync(request);
+        return Ok("Room added");
+    }
+
+    [HttpPut("rooms/{id}")]
+    public async Task<IActionResult> UpdateRoom(int id, [FromBody] object request)
+    {
+        await _service.UpdateRoomAsync(id, request);
+        return Ok("Room updated");
+    }
+
+    [HttpDelete("rooms/{id}")]
+    public async Task<IActionResult> DeleteRoom(int id)
+    {
+        await _service.DeleteRoomAsync(id);
+        return Ok("Room deleted");
+    }
+
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard()
+    {
+        var result = await _service.GetDashboardStatsAsync();
+        return Ok(result);
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using CatalogService.Application.DTOs.Request;
 using CatalogService.Application.Interfaces;
-using CatalogService.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,5 +40,21 @@ public class HotelsController : ControllerBase
     {
         await _hotelService.AddHotelAsync(request);
         return Ok("Hotel added");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateHotel(int id, UpdateHotelRequest request)
+    {
+        await _hotelService.UpdateHotelAsync(id, request);
+        return Ok("Hotel updated");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteHotel(int id)
+    {
+        await _hotelService.DeleteHotelAsync(id);
+        return Ok("Hotel deleted");
     }
 }

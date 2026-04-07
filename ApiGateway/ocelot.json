@@ -11,7 +11,7 @@
       ],
       "SwaggerKey": "identity",
       "UpstreamPathTemplate": "/auth/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/hotels/{everything}",
@@ -24,7 +24,20 @@
       ],
       "SwaggerKey": "catalog",
       "UpstreamPathTemplate": "/hotels/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/rooms/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        }
+      ],
+      "SwaggerKey": "catalog",
+      "UpstreamPathTemplate": "/rooms/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/booking/{everything}",
@@ -37,7 +50,7 @@
       ],
       "SwaggerKey": "booking",
       "UpstreamPathTemplate": "/booking/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/admin/{everything}",
@@ -50,10 +63,10 @@
       ],
       "SwaggerKey": "admin",
       "UpstreamPathTemplate": "/admin/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7000"
+    "BaseUrl": "https://localhost:7067"
   }
 }

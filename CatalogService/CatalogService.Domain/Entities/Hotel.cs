@@ -13,4 +13,6 @@ public class Hotel
     public decimal PricePerNight { get; set; }
 
     public int AvailableRooms { get; set; }
+
+    public List<Room> Rooms { get; set; } = new();
 }

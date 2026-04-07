@@ -51,6 +51,48 @@ namespace CatalogService.Infrastructure.Migrations
 
                     b.ToTable("Hotels");
                 });
+
+            modelBuilder.Entity("CatalogService.Domain.Entities.Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AvailableCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("CatalogService.Domain.Entities.Room", b =>
+                {
+                    b.HasOne("CatalogService.Domain.Entities.Hotel", null)
+                        .WithMany("Rooms")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CatalogService.Domain.Entities.Hotel", b =>
+                {
+                    b.Navigation("Rooms");
+                });
 #pragma warning restore 612, 618
         }
     }

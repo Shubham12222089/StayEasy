@@ -14,5 +14,15 @@ public class User
 
     public string Role { get; set; } = "Guest"; // Guest / Admin
 
+    public bool IsBlocked { get; set; }
+
+    public bool IsEmailVerified { get; set; }
+
+    public string? VerificationToken { get; set; }
+
+    public string? EmailOtp { get; set; }
+
+    public DateTime? OtpExpiresAt { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

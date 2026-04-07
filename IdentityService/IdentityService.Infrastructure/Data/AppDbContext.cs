@@ -28,6 +28,8 @@ public class AppDbContext : DbContext
             Email = "admin@stayeasy.com",
             PasswordHash = "$2a$11$MKOO7Yp.TT2mTlIad0Whou3BvQbJoJFPS7b6t7WSpCpEPS/GOZK4G",//Admin@123
             Role = "Admin",
+           IsEmailVerified = true,
+           VerificationToken = null,
             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
         });
     }

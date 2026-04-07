@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 // 🔹 DI
 builder.Services.AddScoped<IAdminService, AdminService.Application.Services.AdminService>();
 builder.Services.AddHttpClient<BookingClient>();
+builder.Services.AddHttpClient<IdentityClient>();
+builder.Services.AddHttpClient<CatalogClient>();
 builder.Services.AddHttpContextAccessor();
 
 // 🔹 JWT

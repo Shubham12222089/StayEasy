@@ -19,6 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // 🔹 DI
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<HotelRepository>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<RoomRepository>();
 
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);

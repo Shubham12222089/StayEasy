@@ -30,6 +30,20 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request)
+    {
+        await _authService.VerifyEmailAsync(request.Email, request.Otp);
+        return Ok("Email verified");
+    }
+
+    [HttpPost("resend-otp")]
+    public async Task<IActionResult> ResendOtp(ResendOtpRequest request)
+    {
+        await _authService.ResendOtpAsync(request.Email);
+        return Ok("OTP sent");
+    }
+
     [Authorize]
     [HttpGet("me")]
     public IActionResult GetMe()
