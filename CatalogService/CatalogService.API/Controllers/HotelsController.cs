@@ -10,10 +10,12 @@ namespace CatalogService.API.Controllers;
 public class HotelsController : ControllerBase
 {
     private readonly IHotelService _hotelService;
+    private readonly IRoomService _roomService;
 
-    public HotelsController(IHotelService hotelService)
+    public HotelsController(IHotelService hotelService, IRoomService roomService)
     {
         _hotelService = hotelService;
+        _roomService = roomService;
     }
 
     [HttpGet]
@@ -23,8 +25,15 @@ public class HotelsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("{hotelId}/rooms")]
+    public async Task<IActionResult> GetRoomsByHotel(Guid hotelId)
+    {
+        var result = await _roomService.GetRoomsByHotelAsync(hotelId);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _hotelService.GetHotelByIdAsync(id);
 
@@ -44,7 +53,7 @@ public class HotelsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateHotel(int id, UpdateHotelRequest request)
+    public async Task<IActionResult> UpdateHotel(Guid id, UpdateHotelRequest request)
     {
         await _hotelService.UpdateHotelAsync(id, request);
         return Ok("Hotel updated");
@@ -52,7 +61,7 @@ public class HotelsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteHotel(int id)
+    public async Task<IActionResult> DeleteHotel(Guid id)
     {
         await _hotelService.DeleteHotelAsync(id);
         return Ok("Hotel deleted");

@@ -1,10 +1,12 @@
 using AdminService.Application.Interfaces;
 using AdminService.Application.Services;
 using AdminService.Infrastructure.Messaging;
+using AdminService.Infrastructure.Security;
 using AdminService.Infrastructure.Services;
 using AdminService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,8 @@ builder.Services.AddHttpClient<BookingClient>();
 builder.Services.AddHttpClient<IdentityClient>();
 builder.Services.AddHttpClient<CatalogClient>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<RevokedTokenStore>();
+builder.Services.AddHostedService<LogoutEventConsumer>();
 
 // 🔹 JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -36,6 +40,25 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var jwtToken = context.SecurityToken as JwtSecurityToken;
+            var jti = jwtToken?.Id ?? context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (string.IsNullOrWhiteSpace(jti))
+                return Task.CompletedTask;
+
+            var store = context.HttpContext.RequestServices.GetRequiredService<RevokedTokenStore>();
+
+            if (store.IsRevoked(jti))
+                context.Fail("Token revoked");
+
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -84,7 +107,10 @@ consumer.StartAsync().GetAwaiter().GetResult();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.ConfigObject.PersistAuthorization = true;
+    });
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

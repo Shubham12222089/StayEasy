@@ -1,4 +1,5 @@
 using BookingService.Application.DTOs.Request;
+using BookingService.Application.Events;
 using BookingService.Application.Exceptions;
 using BookingService.Application.Interfaces;
 using BookingService.Domain.Entities;
@@ -42,6 +43,14 @@ public class BookingService : IBookingService
         });
 
         await _repository.SaveChangesAsync();
+
+        await _publisher.PublishAsync("cart_pending", new CartPendingEvent
+        {
+            UserId = userId,
+            RoomId = request.RoomId,
+            Quantity = request.Quantity,
+            Price = room.Price
+        });
     }
 
     public async Task CheckoutAsync(int userId)

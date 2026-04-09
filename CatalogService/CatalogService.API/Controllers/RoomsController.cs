@@ -17,14 +17,14 @@ public class RoomsController : ControllerBase
     }
 
     [HttpGet("hotel/{hotelId}")]
-    public async Task<IActionResult> GetByHotel(int hotelId)
+    public async Task<IActionResult> GetByHotel(Guid hotelId)
     {
         var result = await _roomService.GetRoomsByHotelAsync(hotelId);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _roomService.GetRoomByIdAsync(id);
         if (result == null) return NotFound();
@@ -40,7 +40,7 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPut("{id}/reserve")]
-    public async Task<IActionResult> ReserveRoom(int id, ReserveRoomRequest request)
+    public async Task<IActionResult> ReserveRoom(Guid id, ReserveRoomRequest request)
     {
         await _roomService.ReserveRoomAsync(id, request.Quantity);
         return Ok("Room reserved");
@@ -48,7 +48,7 @@ public class RoomsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRoom(int id, UpdateRoomRequest request)
+    public async Task<IActionResult> UpdateRoom(Guid id, UpdateRoomRequest request)
     {
         await _roomService.UpdateRoomAsync(id, request);
         return Ok("Room updated");
@@ -56,7 +56,7 @@ public class RoomsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRoom(int id)
+    public async Task<IActionResult> DeleteRoom(Guid id)
     {
         await _roomService.DeleteRoomAsync(id);
         return Ok("Room deleted");

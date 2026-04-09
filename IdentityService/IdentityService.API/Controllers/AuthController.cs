@@ -44,6 +44,28 @@ public class AuthController : ControllerBase
         return Ok("OTP sent");
     }
 
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> RequestPasswordReset(RequestPasswordResetRequest request)
+    {
+        await _authService.RequestPasswordResetAsync(request.Email);
+        return Ok("Password reset OTP sent");
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+    {
+        await _authService.ResetPasswordAsync(request.Email, request.Otp, request.NewPassword);
+        return Ok("Password updated");
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _authService.LogoutAsync();
+        return Ok("Logged out");
+    }
+
     [Authorize]
     [HttpGet("me")]
     public IActionResult GetMe()

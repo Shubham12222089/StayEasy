@@ -27,7 +27,7 @@ public class CatalogClient
         return await response.Content.ReadFromJsonAsync<List<HotelSummary>>() ?? new List<HotelSummary>();
     }
 
-    public async Task<List<RoomSummary>> GetRoomsByHotelAsync(int hotelId)
+    public async Task<List<RoomSummary>> GetRoomsByHotelAsync(Guid hotelId)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7092/api/rooms/hotel/{hotelId}");
         AddAuthHeader(request);
@@ -51,7 +51,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateHotelAsync(int id, object payload)
+    public async Task UpdateHotelAsync(Guid id, object payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7092/api/hotels/{id}")
         {
@@ -64,7 +64,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteHotelAsync(int id)
+    public async Task DeleteHotelAsync(Guid id)
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:7092/api/hotels/{id}");
         AddAuthHeader(request);
@@ -86,7 +86,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateRoomAsync(int id, object payload)
+    public async Task UpdateRoomAsync(Guid id, object payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7092/api/rooms/{id}")
         {
@@ -99,7 +99,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteRoomAsync(int id)
+    public async Task DeleteRoomAsync(Guid id)
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:7092/api/rooms/{id}");
         AddAuthHeader(request);

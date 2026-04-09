@@ -24,5 +24,9 @@ public class User
 
     public DateTime? OtpExpiresAt { get; set; }
 
+    public string? PasswordResetOtp { get; set; }
+
+    public DateTime? PasswordResetExpiresAt { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

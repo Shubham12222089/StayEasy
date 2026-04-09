@@ -1,6 +1,7 @@
 using IdentityService.Application.Interfaces.Services;
 using IdentityService.Application.Services;
 using IdentityService.Infrastructure.Data;
+using IdentityService.Infrastructure.Messaging;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using IdentityService.API.Middleware;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,8 +23,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<RevokedTokenRepository>();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddSingleton<RabbitMQPublisher>();
+builder.Services.AddHttpContextAccessor();
 
 // 🔹 JWT Authentication
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -44,6 +49,22 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var jti = context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (string.IsNullOrWhiteSpace(jti))
+                return;
+
+            var repository = context.HttpContext.RequestServices.GetRequiredService<RevokedTokenRepository>();
+
+            if (await repository.IsRevokedAsync(jti))
+                context.Fail("Token revoked");
+        }
     };
 });
 
@@ -92,7 +113,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.ConfigObject.PersistAuthorization = true;
+    });
 }
 
 app.UseCors();

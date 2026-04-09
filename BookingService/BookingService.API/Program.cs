@@ -3,11 +3,13 @@ using BookingService.Application.Services;
 using BookingService.Infrastructure.Data;
 using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
+using BookingService.Infrastructure.Security;
 using BookingService.Infrastructure.Services;
 using BookingService.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,8 @@ builder.Services.AddScoped<IBookingService, BookingService.Application.Services.
 builder.Services.AddScoped<BookingRepository>();
 builder.Services.AddSingleton<RabbitMQPublisher>();
 builder.Services.AddHttpClient<CatalogServiceClient>();
+builder.Services.AddSingleton<RevokedTokenStore>();
+builder.Services.AddHostedService<LogoutEventConsumer>();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 
@@ -42,6 +46,25 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var jwtToken = context.SecurityToken as JwtSecurityToken;
+            var jti = jwtToken?.Id ?? context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (string.IsNullOrWhiteSpace(jti))
+                return Task.CompletedTask;
+
+            var store = context.HttpContext.RequestServices.GetRequiredService<RevokedTokenStore>();
+
+            if (store.IsRevoked(jti))
+                context.Fail("Token revoked");
+
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -87,7 +110,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.ConfigObject.PersistAuthorization = true;
+    });
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

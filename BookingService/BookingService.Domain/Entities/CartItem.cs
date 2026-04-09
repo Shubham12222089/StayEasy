@@ -6,7 +6,7 @@ public class CartItem
 
     public int CartId { get; set; }
 
-    public int RoomId { get; set; }
+    public Guid RoomId { get; set; }
 
     public int Quantity { get; set; }
 

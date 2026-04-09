@@ -381,6 +381,19 @@
           }
         }
       },
+      "RabbitMQ.Client/7.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/RabbitMQ.Client.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.ClientModel/1.5.1": {
         "type": "package",
         "dependencies": {
@@ -503,7 +516,8 @@
         "dependencies": {
           "BCrypt.Net-Next": "4.1.0",
           "IdentityService.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.5"
+          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.5",
+          "RabbitMQ.Client": "7.0.0"
         },
         "compile": {
           "bin/placeholder/IdentityService.Infrastructure.dll": {}
@@ -995,6 +1009,23 @@
         "lib/netstandard2.0/Microsoft.SqlServer.Server.xml",
         "microsoft.sqlserver.server.1.0.0.nupkg.sha512",
         "microsoft.sqlserver.server.nuspec"
+      ]
+    },
+    "RabbitMQ.Client/7.0.0": {
+      "sha512": "8YJz22mOSMtkbIVuVSz2HbJwbpKwRoXQ1uqbczDUt1w1Ds8dxFs6dkV/oZ8AlTmkErZjtQelHv+oBu52ud00WA==",
+      "type": "package",
+      "path": "rabbitmq.client/7.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "icon.png",
+        "lib/net8.0/RabbitMQ.Client.dll",
+        "lib/net8.0/RabbitMQ.Client.xml",
+        "lib/netstandard2.0/RabbitMQ.Client.dll",
+        "lib/netstandard2.0/RabbitMQ.Client.xml",
+        "rabbitmq.client.7.0.0.nupkg.sha512",
+        "rabbitmq.client.nuspec"
       ]
     },
     "System.ClientModel/1.5.1": {

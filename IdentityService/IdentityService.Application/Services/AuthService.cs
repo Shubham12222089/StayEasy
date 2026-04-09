@@ -1,12 +1,15 @@
 ﻿using IdentityService.Application.DTOs.Request;
 using IdentityService.Application.DTOs.Response;
+using IdentityService.Application.Events;
 using IdentityService.Application.Exceptions;
 using IdentityService.Application.Interfaces.Services;
 using IdentityService.Domain.Entities;
+using IdentityService.Infrastructure.Messaging;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace IdentityService.Application.Services;
 
@@ -17,18 +20,27 @@ public class AuthService : IAuthService
     private readonly JwtService _jwtService;
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _configuration;
+    private readonly RevokedTokenRepository _revokedTokenRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly RabbitMQPublisher _rabbitMqPublisher;
 
     public AuthService(UserRepository userRepository,
                        PasswordHasher passwordHasher,
                        JwtService jwtService,
                        IEmailSender emailSender,
-                       IConfiguration configuration)
+                       IConfiguration configuration,
+                       RevokedTokenRepository revokedTokenRepository,
+                       IHttpContextAccessor httpContextAccessor,
+                       RabbitMQPublisher rabbitMqPublisher)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
         _emailSender = emailSender;
         _configuration = configuration;
+        _revokedTokenRepository = revokedTokenRepository;
+        _httpContextAccessor = httpContextAccessor;
+        _rabbitMqPublisher = rabbitMqPublisher;
     }
 
     public async Task<AuthResponse> RegisterAsync(SignupRequest request)
@@ -137,6 +149,76 @@ public class AuthService : IAuthService
             user.Email,
             "Verify your email",
             $"Your verification OTP is: {otp}");
+    }
+
+    public async Task RequestPasswordResetAsync(string email)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+
+        if (user == null)
+            throw new ApiException("Invalid email", StatusCodes.Status400BadRequest);
+
+        var otp = GenerateOtp();
+        user.PasswordResetOtp = otp;
+        user.PasswordResetExpiresAt = DateTime.UtcNow.AddMinutes(10);
+
+        await _userRepository.SaveChangesAsync();
+
+        await _emailSender.SendEmailAsync(
+            user.Email,
+            "Reset your password",
+            $"Your password reset OTP is: {otp}");
+    }
+
+    public async Task ResetPasswordAsync(string email, string otp, string newPassword)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+
+        if (user == null)
+            throw new ApiException("Invalid email", StatusCodes.Status400BadRequest);
+
+        if (user.PasswordResetOtp == null || user.PasswordResetExpiresAt == null)
+            throw new ApiException("OTP not found", StatusCodes.Status400BadRequest);
+
+        if (user.PasswordResetExpiresAt < DateTime.UtcNow)
+            throw new ApiException("OTP expired", StatusCodes.Status400BadRequest);
+
+        if (!string.Equals(user.PasswordResetOtp, otp, StringComparison.Ordinal))
+            throw new ApiException("Invalid OTP", StatusCodes.Status400BadRequest);
+
+        user.PasswordHash = _passwordHasher.Hash(newPassword);
+        user.PasswordResetOtp = null;
+        user.PasswordResetExpiresAt = null;
+
+        await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task LogoutAsync()
+    {
+        var authorization = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
+
+        if (string.IsNullOrWhiteSpace(authorization) || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var tokenValue = authorization["Bearer ".Length..].Trim();
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(tokenValue);
+        var jti = token.Id;
+
+        if (string.IsNullOrWhiteSpace(jti))
+            return;
+
+        await _revokedTokenRepository.AddAsync(new RevokedToken
+        {
+            Jti = jti,
+            ExpiresAt = token.ValidTo
+        });
+
+        await _rabbitMqPublisher.PublishAsync("logout_event", new LogoutEvent
+        {
+            Jti = jti,
+            ExpiresAt = token.ValidTo
+        });
     }
 
     private static string GenerateOtp()

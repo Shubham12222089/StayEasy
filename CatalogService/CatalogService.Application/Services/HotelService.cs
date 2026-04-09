@@ -40,11 +40,19 @@ public class HotelService : IHotelService
             Id = h.Id,
             Name = h.Name,
             Location = h.Location,
-            PricePerNight = h.PricePerNight
+            PricePerNight = h.PricePerNight,
+            Rooms = h.Rooms.Select(r => new RoomResponse
+            {
+                Id = r.Id,
+                HotelId = r.HotelId,
+                Type = r.Type,
+                Price = r.Price,
+                AvailableCount = r.AvailableCount
+            }).ToList()
         }).ToList();
     }
 
-    public async Task<HotelResponse?> GetHotelByIdAsync(int id)
+    public async Task<HotelResponse?> GetHotelByIdAsync(Guid id)
     {
         var hotel = await _repository.GetByIdAsync(id);
 
@@ -55,11 +63,19 @@ public class HotelService : IHotelService
             Id = hotel.Id,
             Name = hotel.Name,
             Location = hotel.Location,
-            PricePerNight = hotel.PricePerNight
+            PricePerNight = hotel.PricePerNight,
+            Rooms = hotel.Rooms.Select(r => new RoomResponse
+            {
+                Id = r.Id,
+                HotelId = r.HotelId,
+                Type = r.Type,
+                Price = r.Price,
+                AvailableCount = r.AvailableCount
+            }).ToList()
         };
     }
 
-    public async Task UpdateHotelAsync(int id, UpdateHotelRequest request)
+    public async Task UpdateHotelAsync(Guid id, UpdateHotelRequest request)
     {
         var hotel = await _repository.GetByIdAsync(id);
 
@@ -75,7 +91,7 @@ public class HotelService : IHotelService
         await _repository.SaveChangesAsync();
     }
 
-    public async Task DeleteHotelAsync(int id)
+    public async Task DeleteHotelAsync(Guid id)
     {
         var hotel = await _repository.GetByIdAsync(id);
 

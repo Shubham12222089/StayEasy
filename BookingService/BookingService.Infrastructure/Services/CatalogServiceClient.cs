@@ -11,14 +11,14 @@ public class CatalogServiceClient
         _httpClient = httpClient;
     }
 
-    public async Task<RoomResponse?> GetRoomAsync(int roomId)
+    public async Task<RoomResponse?> GetRoomAsync(Guid roomId)
     {
         return await _httpClient.GetFromJsonAsync<RoomResponse>(
             $"https://localhost:7092/api/rooms/{roomId}"
         );
     }
 
-    public async Task ReserveRoomAsync(int roomId, int quantity)
+    public async Task ReserveRoomAsync(Guid roomId, int quantity)
     {
         var response = await _httpClient.PutAsJsonAsync(
             $"https://localhost:7092/api/rooms/{roomId}/reserve",
@@ -30,7 +30,7 @@ public class CatalogServiceClient
 
 public class RoomResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public decimal Price { get; set; }
     public int AvailableCount { get; set; }
 }

@@ -81,8 +81,8 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

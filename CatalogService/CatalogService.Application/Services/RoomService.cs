@@ -30,7 +30,7 @@ public class RoomService : IRoomService
         await _repository.AddAsync(room);
     }
 
-    public async Task<List<RoomResponse>> GetRoomsByHotelAsync(int hotelId)
+    public async Task<List<RoomResponse>> GetRoomsByHotelAsync(Guid hotelId)
     {
         var rooms = await _repository.GetByHotelIdAsync(hotelId);
 
@@ -44,7 +44,7 @@ public class RoomService : IRoomService
         }).ToList();
     }
 
-    public async Task<RoomResponse?> GetRoomByIdAsync(int id)
+    public async Task<RoomResponse?> GetRoomByIdAsync(Guid id)
     {
         var room = await _repository.GetByIdAsync(id);
 
@@ -60,7 +60,7 @@ public class RoomService : IRoomService
         };
     }
 
-    public async Task ReserveRoomAsync(int roomId, int quantity)
+    public async Task ReserveRoomAsync(Guid roomId, int quantity)
     {
         var room = await _repository.GetByIdAsync(roomId);
 
@@ -75,7 +75,7 @@ public class RoomService : IRoomService
         await _repository.SaveChangesAsync();
     }
 
-    public async Task UpdateRoomAsync(int id, UpdateRoomRequest request)
+    public async Task UpdateRoomAsync(Guid id, UpdateRoomRequest request)
     {
         var room = await _repository.GetByIdAsync(id);
 
@@ -89,7 +89,7 @@ public class RoomService : IRoomService
         await _repository.SaveChangesAsync();
     }
 
-    public async Task DeleteRoomAsync(int id)
+    public async Task DeleteRoomAsync(Guid id)
     {
         var room = await _repository.GetByIdAsync(id);
 

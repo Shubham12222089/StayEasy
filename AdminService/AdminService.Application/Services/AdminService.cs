@@ -47,7 +47,7 @@ public class AdminService : IAdminService
         return await _catalogClient.GetHotelsAsync();
     }
 
-    public async Task<List<RoomSummary>> GetRoomsByHotelAsync(int hotelId)
+    public async Task<List<RoomSummary>> GetRoomsByHotelAsync(Guid hotelId)
     {
         return await _catalogClient.GetRoomsByHotelAsync(hotelId);
     }
@@ -57,12 +57,12 @@ public class AdminService : IAdminService
         await _catalogClient.AddHotelAsync(payload);
     }
 
-    public async Task UpdateHotelAsync(int id, object payload)
+    public async Task UpdateHotelAsync(Guid id, object payload)
     {
         await _catalogClient.UpdateHotelAsync(id, payload);
     }
 
-    public async Task DeleteHotelAsync(int id)
+    public async Task DeleteHotelAsync(Guid id)
     {
         await _catalogClient.DeleteHotelAsync(id);
     }
@@ -72,12 +72,12 @@ public class AdminService : IAdminService
         await _catalogClient.AddRoomAsync(payload);
     }
 
-    public async Task UpdateRoomAsync(int id, object payload)
+    public async Task UpdateRoomAsync(Guid id, object payload)
     {
         await _catalogClient.UpdateRoomAsync(id, payload);
     }
 
-    public async Task DeleteRoomAsync(int id)
+    public async Task DeleteRoomAsync(Guid id)
     {
         await _catalogClient.DeleteRoomAsync(id);
     }

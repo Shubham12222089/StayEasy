@@ -9,9 +9,9 @@ public interface IHotelService
 
     Task<List<HotelResponse>> GetAllHotelsAsync();
 
-    Task<HotelResponse?> GetHotelByIdAsync(int id);
+    Task<HotelResponse?> GetHotelByIdAsync(Guid id);
 
-    Task UpdateHotelAsync(int id, UpdateHotelRequest request);
+    Task UpdateHotelAsync(Guid id, UpdateHotelRequest request);
 
-    Task DeleteHotelAsync(int id);
+    Task DeleteHotelAsync(Guid id);
 }

@@ -19,14 +19,14 @@ public class RoomRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<Room>> GetByHotelIdAsync(int hotelId)
+    public async Task<List<Room>> GetByHotelIdAsync(Guid hotelId)
     {
         return await _context.Rooms
             .Where(r => r.HotelId == hotelId)
             .ToListAsync();
     }
 
-    public async Task<Room?> GetByIdAsync(int id)
+    public async Task<Room?> GetByIdAsync(Guid id)
     {
         return await _context.Rooms.FindAsync(id);
     }

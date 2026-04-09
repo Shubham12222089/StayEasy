@@ -2,9 +2,9 @@ namespace AdminService.Domain.Entities;
 
 public class RoomSummary
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
-    public int HotelId { get; set; }
+    public Guid HotelId { get; set; }
 
     public string Type { get; set; } = string.Empty;
 

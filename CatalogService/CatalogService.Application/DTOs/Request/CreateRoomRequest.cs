@@ -2,7 +2,7 @@ namespace CatalogService.Application.DTOs.Request;
 
 public class CreateRoomRequest
 {
-    public int HotelId { get; set; }
+    public Guid HotelId { get; set; }
 
     public string Type { get; set; } = string.Empty;
 

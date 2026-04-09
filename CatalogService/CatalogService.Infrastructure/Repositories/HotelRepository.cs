@@ -21,12 +21,16 @@ public class HotelRepository
 
     public async Task<List<Hotel>> GetAllAsync()
     {
-        return await _context.Hotels.ToListAsync();
+        return await _context.Hotels
+            .Include(h => h.Rooms)
+            .ToListAsync();
     }
 
-    public async Task<Hotel?> GetByIdAsync(int id)
+    public async Task<Hotel?> GetByIdAsync(Guid id)
     {
-        return await _context.Hotels.FindAsync(id);
+        return await _context.Hotels
+            .Include(h => h.Rooms)
+            .FirstOrDefaultAsync(h => h.Id == id);
     }
 
     public async Task DeleteAsync(Hotel hotel)

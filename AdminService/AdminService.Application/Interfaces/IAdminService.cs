@@ -16,19 +16,19 @@ public interface IAdminService
 
     Task<List<HotelSummary>> GetHotelsAsync();
 
-    Task<List<RoomSummary>> GetRoomsByHotelAsync(int hotelId);
+    Task<List<RoomSummary>> GetRoomsByHotelAsync(Guid hotelId);
 
     Task AddHotelAsync(object payload);
 
-    Task UpdateHotelAsync(int id, object payload);
+    Task UpdateHotelAsync(Guid id, object payload);
 
-    Task DeleteHotelAsync(int id);
+    Task DeleteHotelAsync(Guid id);
 
     Task AddRoomAsync(object payload);
 
-    Task UpdateRoomAsync(int id, object payload);
+    Task UpdateRoomAsync(Guid id, object payload);
 
-    Task DeleteRoomAsync(int id);
+    Task DeleteRoomAsync(Guid id);
 
     Task<DashboardStats> GetDashboardStatsAsync();
 }

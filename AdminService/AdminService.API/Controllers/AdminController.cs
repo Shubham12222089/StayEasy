@@ -67,21 +67,21 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("hotels/{id}")]
-    public async Task<IActionResult> UpdateHotel(int id, [FromBody] object request)
+    public async Task<IActionResult> UpdateHotel(Guid id, [FromBody] object request)
     {
         await _service.UpdateHotelAsync(id, request);
         return Ok("Hotel updated");
     }
 
     [HttpDelete("hotels/{id}")]
-    public async Task<IActionResult> DeleteHotel(int id)
+    public async Task<IActionResult> DeleteHotel(Guid id)
     {
         await _service.DeleteHotelAsync(id);
         return Ok("Hotel deleted");
     }
 
     [HttpGet("rooms/hotel/{hotelId}")]
-    public async Task<IActionResult> GetRoomsByHotel(int hotelId)
+    public async Task<IActionResult> GetRoomsByHotel(Guid hotelId)
     {
         var result = await _service.GetRoomsByHotelAsync(hotelId);
         return Ok(result);
@@ -95,14 +95,14 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("rooms/{id}")]
-    public async Task<IActionResult> UpdateRoom(int id, [FromBody] object request)
+    public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] object request)
     {
         await _service.UpdateRoomAsync(id, request);
         return Ok("Room updated");
     }
 
     [HttpDelete("rooms/{id}")]
-    public async Task<IActionResult> DeleteRoom(int id)
+    public async Task<IActionResult> DeleteRoom(Guid id)
     {
         await _service.DeleteRoomAsync(id);
         return Ok("Room deleted");

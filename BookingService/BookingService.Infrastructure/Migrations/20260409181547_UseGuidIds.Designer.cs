@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260406073627_AddedRooms")]
-    partial class AddedRooms
+    [Migration("20260409181547_UseGuidIds")]
+    partial class UseGuidIds
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,8 +84,8 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

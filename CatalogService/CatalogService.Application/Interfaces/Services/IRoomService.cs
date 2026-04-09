@@ -7,13 +7,13 @@ public interface IRoomService
 {
     Task AddRoomAsync(CreateRoomRequest request);
 
-    Task<List<RoomResponse>> GetRoomsByHotelAsync(int hotelId);
+    Task<List<RoomResponse>> GetRoomsByHotelAsync(Guid hotelId);
 
-    Task<RoomResponse?> GetRoomByIdAsync(int id);
+    Task<RoomResponse?> GetRoomByIdAsync(Guid id);
 
-    Task ReserveRoomAsync(int roomId, int quantity);
+    Task ReserveRoomAsync(Guid roomId, int quantity);
 
-    Task UpdateRoomAsync(int id, UpdateRoomRequest request);
+    Task UpdateRoomAsync(Guid id, UpdateRoomRequest request);
 
-    Task DeleteRoomAsync(int id);
+    Task DeleteRoomAsync(Guid id);
 }

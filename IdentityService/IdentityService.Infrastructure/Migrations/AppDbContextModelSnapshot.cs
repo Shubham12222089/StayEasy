@@ -22,6 +22,29 @@ namespace IdentityService.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityService.Domain.Entities.RevokedToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Jti")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RevokedTokens");
+                });
+
             modelBuilder.Entity("IdentityService.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -59,6 +82,12 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordResetOtp")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
