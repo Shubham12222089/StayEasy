@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using AdminService.Domain.DTOs.Request;
 using AdminService.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
@@ -38,7 +39,7 @@ public class CatalogClient
         return await response.Content.ReadFromJsonAsync<List<RoomSummary>>() ?? new List<RoomSummary>();
     }
 
-    public async Task AddHotelAsync(object payload)
+    public async Task AddHotelAsync(CreateHotelRequest payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7092/api/hotels")
         {
@@ -51,7 +52,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateHotelAsync(Guid id, object payload)
+    public async Task UpdateHotelAsync(Guid id, UpdateHotelRequest payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7092/api/hotels/{id}")
         {
@@ -73,7 +74,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task AddRoomAsync(object payload)
+    public async Task AddRoomAsync(CreateRoomRequest payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7092/api/rooms")
         {
@@ -86,7 +87,7 @@ public class CatalogClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateRoomAsync(Guid id, object payload)
+    public async Task UpdateRoomAsync(Guid id, UpdateRoomRequest payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7092/api/rooms/{id}")
         {

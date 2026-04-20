@@ -1,8 +1,9 @@
+using BookingService.Infrastructure.Interfaces;
 using System.Net.Http.Json;
 
 namespace BookingService.Infrastructure.Services;
 
-public class CatalogServiceClient
+public class CatalogServiceClient : ICatalogServiceClient
 {
     private readonly HttpClient _httpClient;
 
@@ -28,14 +29,14 @@ public class CatalogServiceClient
     }
 }
 
+public class ReserveRoomRequest
+{
+    public int Quantity { get; set; }
+}
+
 public class RoomResponse
 {
     public Guid Id { get; set; }
     public decimal Price { get; set; }
     public int AvailableCount { get; set; }
-}
-
-public class ReserveRoomRequest
-{
-    public int Quantity { get; set; }
 }

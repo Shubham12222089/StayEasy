@@ -1,4 +1,5 @@
-﻿using AdminService.Domain.Entities;
+﻿using AdminService.Domain.DTOs.Request;
+using AdminService.Domain.Entities;
 
 namespace AdminService.Application.Interfaces;
 
@@ -18,15 +19,15 @@ public interface IAdminService
 
     Task<List<RoomSummary>> GetRoomsByHotelAsync(Guid hotelId);
 
-    Task AddHotelAsync(object payload);
+    Task AddHotelAsync(CreateHotelRequest payload);
 
-    Task UpdateHotelAsync(Guid id, object payload);
+    Task UpdateHotelAsync(Guid id, UpdateHotelRequest payload);
 
     Task DeleteHotelAsync(Guid id);
 
-    Task AddRoomAsync(object payload);
+    Task AddRoomAsync(CreateRoomRequest payload);
 
-    Task UpdateRoomAsync(Guid id, object payload);
+    Task UpdateRoomAsync(Guid id, UpdateRoomRequest payload);
 
     Task DeleteRoomAsync(Guid id);
 

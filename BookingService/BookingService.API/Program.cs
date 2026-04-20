@@ -1,18 +1,28 @@
 using BookingService.Application.Interfaces;
+using BookingService.Application.Interfaces;
 using BookingService.Application.Services;
+using BookingService.Infrastructure.Interfaces;
 using BookingService.Infrastructure.Data;
 using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
 using BookingService.Infrastructure.Security;
 using BookingService.Infrastructure.Services;
 using BookingService.API.Middleware;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/booking-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // 🔹 DB
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -23,10 +33,13 @@ builder.Services.AddHttpClient();
 // 🔹 DI
 builder.Services.AddScoped<IBookingService, BookingService.Application.Services.BookingService>();
 builder.Services.AddScoped<BookingRepository>();
-builder.Services.AddSingleton<RabbitMQPublisher>();
-builder.Services.AddHttpClient<CatalogServiceClient>();
+builder.Services.AddSingleton<IRabbitMQPublisher, RabbitMQPublisher>();
+builder.Services.AddHttpClient<ICatalogServiceClient, CatalogServiceClient>();
 builder.Services.AddSingleton<RevokedTokenStore>();
 builder.Services.AddHostedService<LogoutEventConsumer>();
+builder.Services.AddHostedService<CartCheckedOutConsumer>();
+builder.Services.AddHostedService<BookingStatusUpdatedConsumer>();
+builder.Services.AddHostedService<BookingQueueInitializer>();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 

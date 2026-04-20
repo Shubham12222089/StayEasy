@@ -4,12 +4,20 @@ using AdminService.Infrastructure.Messaging;
 using AdminService.Infrastructure.Security;
 using AdminService.Infrastructure.Services;
 using AdminService.API.Middleware;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/admin-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // 🔹 DI
 builder.Services.AddScoped<IAdminService, AdminService.Application.Services.AdminService>();
@@ -19,6 +27,7 @@ builder.Services.AddHttpClient<CatalogClient>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<RevokedTokenStore>();
 builder.Services.AddHostedService<LogoutEventConsumer>();
+builder.Services.AddHostedService<BookingCreatedConsumer>();
 
 // 🔹 JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -101,8 +110,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-var consumer = new BookingCreatedConsumer();
-consumer.StartAsync().GetAwaiter().GetResult();
 
 if (app.Environment.IsDevelopment())
 {

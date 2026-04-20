@@ -2,9 +2,11 @@ using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
+using BookingService.Infrastructure.Interfaces;
+
 namespace BookingService.Infrastructure.Messaging;
 
-public class RabbitMQPublisher
+public class RabbitMQPublisher : IRabbitMQPublisher
 {
     private readonly ConnectionFactory _factory;
 
@@ -22,16 +24,23 @@ public class RabbitMQPublisher
         using var channel = await connection.CreateChannelAsync();
 
         await channel.QueueDeclareAsync(queueName,
-            durable: false,
+            durable: true,
             exclusive: false,
             autoDelete: false);
 
         var json = JsonSerializer.Serialize(message);
         var body = Encoding.UTF8.GetBytes(json);
 
+        var properties = new BasicProperties
+        {
+            Persistent = true
+        };
+
         await channel.BasicPublishAsync(
             exchange: "",
             routingKey: queueName,
+            mandatory: false,
+            basicProperties: properties,
             body: body);
     }
 }

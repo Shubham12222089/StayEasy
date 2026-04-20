@@ -1,4 +1,5 @@
 ﻿using AdminService.Application.Interfaces;
+using AdminService.Domain.DTOs.Request;
 using AdminService.Domain.Entities;
 using AdminService.Infrastructure.Services;
 
@@ -52,12 +53,12 @@ public class AdminService : IAdminService
         return await _catalogClient.GetRoomsByHotelAsync(hotelId);
     }
 
-    public async Task AddHotelAsync(object payload)
+    public async Task AddHotelAsync(CreateHotelRequest payload)
     {
         await _catalogClient.AddHotelAsync(payload);
     }
 
-    public async Task UpdateHotelAsync(Guid id, object payload)
+    public async Task UpdateHotelAsync(Guid id, UpdateHotelRequest payload)
     {
         await _catalogClient.UpdateHotelAsync(id, payload);
     }
@@ -67,12 +68,12 @@ public class AdminService : IAdminService
         await _catalogClient.DeleteHotelAsync(id);
     }
 
-    public async Task AddRoomAsync(object payload)
+    public async Task AddRoomAsync(CreateRoomRequest payload)
     {
         await _catalogClient.AddRoomAsync(payload);
     }
 
-    public async Task UpdateRoomAsync(Guid id, object payload)
+    public async Task UpdateRoomAsync(Guid id, UpdateRoomRequest payload)
     {
         await _catalogClient.UpdateRoomAsync(id, payload);
     }

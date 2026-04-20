@@ -67,6 +67,18 @@
               "target": "Package",
               "version": "[10.0.5, )"
             },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[7.0.0, )"
@@ -561,12 +573,6 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "dependencies": {
-            "RabbitMQ.Client": {
-              "target": "Package",
-              "version": "[7.2.1, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",

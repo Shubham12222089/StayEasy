@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BookingService.Domain\BookingService.Domain.csproj" />
     <ProjectReference Include="..\BookingService.Infrastructure\BookingService.Infrastructure.csproj" />
   </ItemGroup>

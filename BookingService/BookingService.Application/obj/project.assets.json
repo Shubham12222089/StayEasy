@@ -368,7 +368,7 @@
           }
         }
       },
-      "RabbitMQ.Client/7.2.1": {
+      "RabbitMQ.Client/7.0.0": {
         "type": "package",
         "compile": {
           "lib/net8.0/RabbitMQ.Client.dll": {
@@ -969,10 +969,10 @@
         "microsoft.sqlserver.server.nuspec"
       ]
     },
-    "RabbitMQ.Client/7.2.1": {
-      "sha512": "YKXEfg9fVQiTKgZlvIhAfPSFaamEgi8DsQmisCH0IAsU4FYLrtoguDrDj6JtJVGUt40QPnBLRH6fTQcAC4qsOg==",
+    "RabbitMQ.Client/7.0.0": {
+      "sha512": "8YJz22mOSMtkbIVuVSz2HbJwbpKwRoXQ1uqbczDUt1w1Ds8dxFs6dkV/oZ8AlTmkErZjtQelHv+oBu52ud00WA==",
       "type": "package",
-      "path": "rabbitmq.client/7.2.1",
+      "path": "rabbitmq.client/7.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -982,7 +982,7 @@
         "lib/net8.0/RabbitMQ.Client.xml",
         "lib/netstandard2.0/RabbitMQ.Client.dll",
         "lib/netstandard2.0/RabbitMQ.Client.xml",
-        "rabbitmq.client.7.2.1.nupkg.sha512",
+        "rabbitmq.client.7.0.0.nupkg.sha512",
         "rabbitmq.client.nuspec"
       ]
     },
@@ -1167,8 +1167,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "BookingService.Domain >= 1.0.0",
-      "BookingService.Infrastructure >= 1.0.0",
-      "RabbitMQ.Client >= 7.2.1"
+      "BookingService.Infrastructure >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -1227,12 +1226,6 @@
     "frameworks": {
       "net10.0": {
         "targetAlias": "net10.0",
-        "dependencies": {
-          "RabbitMQ.Client": {
-            "target": "Package",
-            "version": "[7.2.1, )"
-          }
-        },
         "imports": [
           "net461",
           "net462",

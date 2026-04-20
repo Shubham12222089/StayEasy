@@ -5,13 +5,21 @@ using CatalogService.Infrastructure.Messaging;
 using CatalogService.Infrastructure.Repositories;
 using CatalogService.Infrastructure.Security;
 using CatalogService.API.Middleware;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/catalog-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // 🔹 DB
 builder.Services.AddDbContext<AppDbContext>(options =>

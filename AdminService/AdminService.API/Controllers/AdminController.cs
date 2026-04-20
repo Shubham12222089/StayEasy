@@ -1,5 +1,6 @@
 ﻿using AdminService.Application.DTOs.Request;
 using AdminService.Application.Interfaces;
+using AdminService.Domain.DTOs.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,14 +61,14 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("hotels")]
-    public async Task<IActionResult> AddHotel([FromBody] object request)
+    public async Task<IActionResult> AddHotel([FromBody] CreateHotelRequest request)
     {
         await _service.AddHotelAsync(request);
         return Ok("Hotel added");
     }
 
     [HttpPut("hotels/{id}")]
-    public async Task<IActionResult> UpdateHotel(Guid id, [FromBody] object request)
+    public async Task<IActionResult> UpdateHotel(Guid id, [FromBody] UpdateHotelRequest request)
     {
         await _service.UpdateHotelAsync(id, request);
         return Ok("Hotel updated");
@@ -88,14 +89,14 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("rooms")]
-    public async Task<IActionResult> AddRoom([FromBody] object request)
+    public async Task<IActionResult> AddRoom([FromBody] CreateRoomRequest request)
     {
         await _service.AddRoomAsync(request);
         return Ok("Room added");
     }
 
     [HttpPut("rooms/{id}")]
-    public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] object request)
+    public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] UpdateRoomRequest request)
     {
         await _service.UpdateRoomAsync(id, request);
         return Ok("Room updated");

@@ -2,10 +2,9 @@ using BookingService.Application.DTOs.Request;
 using BookingService.Application.Events;
 using BookingService.Application.Exceptions;
 using BookingService.Application.Interfaces;
+using BookingService.Infrastructure.Interfaces;
 using BookingService.Domain.Entities;
-using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Repositories;
-using BookingService.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace BookingService.Application.Services;
@@ -13,10 +12,10 @@ namespace BookingService.Application.Services;
 public class BookingService : IBookingService
 {
     private readonly BookingRepository _repository;
-    private readonly CatalogServiceClient _catalogClient;
-    private readonly RabbitMQPublisher _publisher;
+    private readonly ICatalogServiceClient _catalogClient;
+    private readonly IRabbitMQPublisher _publisher;
 
-    public BookingService(BookingRepository repository, CatalogServiceClient catalogClient, RabbitMQPublisher publisher)
+    public BookingService(BookingRepository repository, ICatalogServiceClient catalogClient, IRabbitMQPublisher publisher)
     {
         _repository = repository;
         _catalogClient = catalogClient;
@@ -26,6 +25,7 @@ public class BookingService : IBookingService
     public async Task AddToCartAsync(int userId, AddToCartRequest request)
     {
         var cart = await _repository.GetOrCreateCart(userId);
+        var wasEmpty = cart.Items.Count == 0;
 
         var room = await _catalogClient.GetRoomAsync(request.RoomId);
 
@@ -35,22 +35,35 @@ public class BookingService : IBookingService
         if (room.AvailableCount < request.Quantity)
             throw new ApiException("Room not available", StatusCodes.Status400BadRequest);
 
-        cart.Items.Add(new CartItem
+        var existingItem = cart.Items.FirstOrDefault(i => i.RoomId == request.RoomId);
+
+        if (existingItem == null)
         {
-            RoomId = request.RoomId,
-            Quantity = request.Quantity,
-            Price = room.Price
-        });
+            cart.Items.Add(new CartItem
+            {
+                RoomId = request.RoomId,
+                Quantity = request.Quantity,
+                Price = room.Price
+            });
+        }
+        else
+        {
+            existingItem.Quantity += request.Quantity;
+            existingItem.Price = room.Price;
+        }
 
         await _repository.SaveChangesAsync();
 
-        await _publisher.PublishAsync("cart_pending", new CartPendingEvent
+        if (wasEmpty)
         {
-            UserId = userId,
-            RoomId = request.RoomId,
-            Quantity = request.Quantity,
-            Price = room.Price
-        });
+            await _publisher.PublishAsync("cart_pending", new CartPendingEvent
+            {
+                UserId = userId,
+                RoomId = request.RoomId,
+                Quantity = request.Quantity,
+                Price = room.Price
+            });
+        }
     }
 
     public async Task CheckoutAsync(int userId)
@@ -61,6 +74,7 @@ public class BookingService : IBookingService
             throw new ApiException("Cart is empty", StatusCodes.Status400BadRequest);
 
         var total = cart.Items.Sum(i => i.Price * i.Quantity);
+        var itemCount = cart.Items.Sum(i => i.Quantity);
 
         foreach (var item in cart.Items)
         {
@@ -76,12 +90,29 @@ public class BookingService : IBookingService
 
         await _repository.AddBookingAsync(booking);
 
+        await _publisher.PublishAsync("cart_checked_out", new CartCheckedOutEvent
+        {
+            UserId = userId,
+            ItemCount = itemCount,
+            TotalAmount = total
+        });
+
         await _publisher.PublishAsync("booking_created", new
         {
             BookingId = booking.Id,
             UserId = userId,
             TotalAmount = total
         });
+
+        await _publisher.PublishAsync("booking_status_updated", new BookingStatusUpdatedEvent
+        {
+            BookingId = booking.Id,
+            UserId = booking.UserId,
+            Status = booking.Status
+        });
+
+        cart.Items.Clear();
+        await _repository.SaveChangesAsync();
     }
 
     public async Task<List<Booking>> GetUserBookingsAsync(int userId)
