@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using AdminService.Domain.Entities;
@@ -9,16 +10,18 @@ public class IdentityClient
 {
     private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string _baseUrl;
 
-    public IdentityClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+    public IdentityClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _httpContextAccessor = httpContextAccessor;
+        _baseUrl = configuration["ServiceUrls:Identity"] ?? "https://localhost:7006";
     }
 
     public async Task<List<UserSummary>> GetUsersAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7006/api/admin/users");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/admin/users");
         AddAuthHeader(request);
 
         var response = await _httpClient.SendAsync(request);
@@ -29,7 +32,7 @@ public class IdentityClient
 
     public async Task BlockUserAsync(int id, bool isBlocked)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7006/api/admin/users/{id}/block")
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{_baseUrl}/api/admin/users/{id}/block")
         {
             Content = JsonContent.Create(new { isBlocked })
         };
@@ -42,7 +45,7 @@ public class IdentityClient
 
     public async Task DeleteUserAsync(int id)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:7006/api/admin/users/{id}");
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"{_baseUrl}/api/admin/users/{id}");
         AddAuthHeader(request);
 
         var response = await _httpClient.SendAsync(request);

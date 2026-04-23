@@ -9,6 +9,7 @@ using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace IdentityService.Application.Services;
@@ -23,6 +24,7 @@ public class AuthService : IAuthService
     private readonly RevokedTokenRepository _revokedTokenRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly RabbitMQPublisher _rabbitMqPublisher;
+    private readonly IHostEnvironment _hostEnvironment;
 
     public AuthService(UserRepository userRepository,
                        PasswordHasher passwordHasher,
@@ -31,7 +33,8 @@ public class AuthService : IAuthService
                        IConfiguration configuration,
                        RevokedTokenRepository revokedTokenRepository,
                        IHttpContextAccessor httpContextAccessor,
-                       RabbitMQPublisher rabbitMqPublisher)
+                       RabbitMQPublisher rabbitMqPublisher,
+                       IHostEnvironment hostEnvironment)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
@@ -41,6 +44,7 @@ public class AuthService : IAuthService
         _revokedTokenRepository = revokedTokenRepository;
         _httpContextAccessor = httpContextAccessor;
         _rabbitMqPublisher = rabbitMqPublisher;
+        _hostEnvironment = hostEnvironment;
     }
 
     public async Task<AuthResponse> RegisterAsync(SignupRequest request)
@@ -51,6 +55,7 @@ public class AuthService : IAuthService
             throw new ApiException("User already exists", StatusCodes.Status400BadRequest);
 
         var otp = GenerateOtp();
+        var isDevelopment = _hostEnvironment.IsDevelopment();
 
         var user = new User
         {
@@ -59,18 +64,21 @@ public class AuthService : IAuthService
             Email = request.Email,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = "Guest",
-            IsEmailVerified = false,
+            IsEmailVerified = isDevelopment,
             VerificationToken = null,
-            EmailOtp = otp,
-            OtpExpiresAt = DateTime.UtcNow.AddMinutes(10)
+            EmailOtp = isDevelopment ? null : otp,
+            OtpExpiresAt = isDevelopment ? null : DateTime.UtcNow.AddMinutes(10)
         };
 
         await _userRepository.AddAsync(user);
 
-        await _emailSender.SendEmailAsync(
-            user.Email,
-            "Verify your email",
-            $"Your verification OTP is: {otp}");
+        if (!isDevelopment)
+        {
+            await _emailSender.SendEmailAsync(
+                user.Email,
+                "Verify your email",
+                $"Your verification OTP is: {otp}");
+        }
 
         var token = _jwtService.GenerateToken(user);
 
@@ -92,7 +100,7 @@ public class AuthService : IAuthService
         if (user.IsBlocked)
             throw new ApiException("User is blocked", StatusCodes.Status403Forbidden);
 
-        if (!user.IsEmailVerified)
+        if (!user.IsEmailVerified && !_hostEnvironment.IsDevelopment())
             throw new ApiException("Verify email first", StatusCodes.Status403Forbidden);
 
         var token = _jwtService.GenerateToken(user);
@@ -223,6 +231,7 @@ public class AuthService : IAuthService
 
     private static string GenerateOtp()
     {
-        return Random.Shared.Next(100000, 999999).ToString();
+        var random = new Random();
+        return random.Next(100000, 999999).ToString();
     }
 }

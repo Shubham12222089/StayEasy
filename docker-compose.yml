@@ -1,0 +1,86 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Your_password123"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      # Use the correct sqlcmd path and make the healthcheck more tolerant during startup
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"Your_password123\" -Q \"SELECT 1\" -C || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  identityservice:
+    build:
+      context: .
+      dockerfile: IdentityService/IdentityService.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "7006:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  catalogservice:
+    build:
+      context: .
+      dockerfile: CatalogService/CatalogService.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "7092:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  bookingservice:
+    build:
+      context: .
+      dockerfile: BookingService/BookingService.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "7071:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      catalogservice:
+        condition: service_started
+
+  adminservice:
+    build:
+      context: .
+      dockerfile: AdminService/AdminService.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "7070:8080"
+    depends_on:
+      bookingservice:
+        condition: service_started
+      identityservice:
+        condition: service_started
+      catalogservice:
+        condition: service_started
+      rabbitmq:
+        condition: service_started

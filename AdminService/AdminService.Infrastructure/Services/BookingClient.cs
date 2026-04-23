@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using AdminService.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -9,16 +10,18 @@ public class BookingClient
 {
     private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string _baseUrl;
 
-    public BookingClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+    public BookingClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _httpContextAccessor = httpContextAccessor;
+        _baseUrl = configuration["ServiceUrls:Booking"] ?? "https://localhost:7071";
     }
 
     public async Task<List<BookingSummary>> GetAllBookings()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7071/api/booking/all");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/booking/all");
 
         var token = _httpContextAccessor.HttpContext?
             .Request.Headers["Authorization"]
@@ -39,7 +42,7 @@ public class BookingClient
     public async Task UpdateBookingStatus(int bookingId, string status)
     {
         var request = new HttpRequestMessage(HttpMethod.Put,
-            $"https://localhost:7071/api/booking/{bookingId}/status");
+            $"{_baseUrl}/api/booking/{bookingId}/status");
 
         var token = _httpContextAccessor.HttpContext?
             .Request.Headers["Authorization"]

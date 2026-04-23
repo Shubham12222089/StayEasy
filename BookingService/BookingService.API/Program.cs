@@ -1,5 +1,4 @@
 using BookingService.Application.Interfaces;
-using BookingService.Application.Interfaces;
 using BookingService.Application.Services;
 using BookingService.Infrastructure.Interfaces;
 using BookingService.Infrastructure.Data;
@@ -120,7 +119,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -130,7 +129,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Docker"))
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

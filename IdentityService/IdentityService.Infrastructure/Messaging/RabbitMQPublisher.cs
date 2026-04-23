@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
@@ -8,11 +9,11 @@ public class RabbitMQPublisher
 {
     private readonly ConnectionFactory _factory;
 
-    public RabbitMQPublisher()
+    public RabbitMQPublisher(IConfiguration configuration)
     {
         _factory = new ConnectionFactory
         {
-            HostName = "localhost"
+            HostName = configuration["RabbitMQ:Host"] ?? "localhost"
         };
     }
 
@@ -22,7 +23,7 @@ public class RabbitMQPublisher
         using var channel = await connection.CreateChannelAsync();
 
         await channel.QueueDeclareAsync(queueName,
-            durable: false,
+            durable: true,
             exclusive: false,
             autoDelete: false);
 

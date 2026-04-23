@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,12 +12,18 @@ public class CartCheckedOutConsumer : BackgroundService
 {
     private IConnection? _connection;
     private IChannel? _channel;
+    private readonly string _host;
+
+    public CartCheckedOutConsumer(IConfiguration configuration)
+    {
+        _host = configuration["RabbitMQ:Host"] ?? "localhost";
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var factory = new ConnectionFactory
         {
-            HostName = "localhost"
+            HostName = _host
         };
 
         while (!stoppingToken.IsCancellationRequested)
