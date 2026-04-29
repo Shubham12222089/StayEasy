@@ -25,6 +25,7 @@ public class HotelService : IHotelService
             Location = request.Location,
             Description = request.Description,
             PricePerNight = request.PricePerNight,
+            Rating = request.Rating,
             AvailableRooms = request.AvailableRooms
         };
 
@@ -41,6 +42,7 @@ public class HotelService : IHotelService
             Name = h.Name,
             Location = h.Location,
             PricePerNight = h.PricePerNight,
+            Rating = h.Rating,
             Rooms = h.Rooms.Select(r => new RoomResponse
             {
                 Id = r.Id,
@@ -64,6 +66,7 @@ public class HotelService : IHotelService
             Name = hotel.Name,
             Location = hotel.Location,
             PricePerNight = hotel.PricePerNight,
+            Rating = hotel.Rating,
             Rooms = hotel.Rooms.Select(r => new RoomResponse
             {
                 Id = r.Id,
@@ -86,6 +89,7 @@ public class HotelService : IHotelService
         hotel.Location = request.Location;
         hotel.Description = request.Description;
         hotel.PricePerNight = request.PricePerNight;
+        hotel.Rating = request.Rating;
         hotel.AvailableRooms = request.AvailableRooms;
 
         await _repository.SaveChangesAsync();

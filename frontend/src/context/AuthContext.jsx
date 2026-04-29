@@ -19,11 +19,13 @@ const decodeToken = (token) => {
     const claims = JSON.parse(base64UrlDecode(payload))
     const email = claims.email || claims.Email || claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
     const role = claims.role || claims.Role || claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
-    const displayName = claims.name || claims.Name || claims.email || claims.Email || email || 'Guest'
+    const firstName = claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || claims.name || claims.Name || ''
+    const displayName = firstName || email || 'Guest'
 
     return {
       email: email || '',
       role: role || '',
+      firstName,
       displayName,
       claims,
     }
@@ -53,7 +55,9 @@ const normalizeUser = (value, token = null) => {
 
   const email = value?.email || value?.Email || tokenUser?.email || ''
   const role = value?.role || value?.Role || tokenUser?.role || ''
+  const firstName = value?.firstName || value?.FirstName || tokenUser?.firstName || ''
   const displayName =
+    firstName ||
     value?.displayName ||
     value?.DisplayName ||
     value?.name ||
@@ -66,6 +70,7 @@ const normalizeUser = (value, token = null) => {
     ...(value || {}),
     email,
     role,
+    firstName,
     displayName,
   }
 }

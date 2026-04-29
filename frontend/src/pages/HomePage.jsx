@@ -3,7 +3,8 @@ import HotelCard from '../components/HotelCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Alert from '../components/Alert'
 import { hotelService } from '../services/hotelService'
-import { Search, Filter, RefreshCw, MapPin, Star, Building2 } from '../components/ui-icons'
+import { Search, Filter, RefreshCw, MapPin, Star, Building2, CheckCircle2 } from '../components/ui-icons'
+import { useAuth } from '../context/AuthContext'
 
 const HomePage = () => {
   const [hotels, setHotels] = useState([])
@@ -11,6 +12,7 @@ const HomePage = () => {
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({ location: '', priceRange: 'all', rating: 'all' })
+  const { user, isAuthenticated } = useAuth()
 
   useEffect(() => {
     fetchHotels()
@@ -24,7 +26,7 @@ const HomePage = () => {
       setHotels(Array.isArray(data) ? data : data?.$values || [])
     } catch (err) {
       setHotels([])
-      setError('Failed to load hotels. Please try again.')
+      setError(err.message || 'Failed to load hotels. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -37,7 +39,7 @@ const HomePage = () => {
   }
 
   const getHotelPrice = (hotel) => Number(hotel.pricePerNight || hotel.PricePerNight || hotel.minimumPrice || hotel.minPrice || hotel.startingPrice || 0)
-  const getHotelRating = (hotel) => Number(hotel.averageRating || hotel.rating || 0)
+  const getHotelRating = (hotel) => Number(hotel.averageRating || hotel.rating || hotel.Rating || 0)
 
   const filteredHotels = useMemo(() => {
     return hotels.filter((hotel) => {
@@ -71,9 +73,28 @@ const HomePage = () => {
     { label: 'Locations', value: new Set(hotels.map((h) => h.location).filter(Boolean)).size, icon: MapPin }
   ]
 
+  const displayName = user?.displayName || user?.firstName || user?.email || 'Guest'
+
   return (
     <div className="page-section">
       <div className="container">
+        {isAuthenticated && (
+          <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 px-6 py-5 animate-fade-in">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-xl font-bold text-white shadow-lg shadow-emerald-500/20">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  <span className="text-sm font-bold text-emerald-800">Welcome back, {displayName}! 👋</span>
+                </div>
+                <p className="mt-0.5 text-sm text-emerald-700/80">Explore hotels and track your bookings from the My Bookings tab.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <section className="mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-900 px-6 py-14 text-white shadow-2xl shadow-blue-950/20 sm:px-10">
           <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
@@ -112,8 +133,9 @@ const HomePage = () => {
           </div>
         </section>
 
-        <section className="card mb-8 p-5 sm:p-6">
-          <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center">
+        <section className="card mb-8 p-5 border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 sm:p-6">
+          <div className="mb-6 flex flex-col gap-3">
+            <h2 className="text-lg font-bold text-slate-900">Search & Filter</h2>
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <input
@@ -121,17 +143,13 @@ const HomePage = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search hotels, cities, or highlights..."
-                className="input-field pl-12"
+                className="input-field pl-12 transition-all duration-200 focus:ring-2 focus:ring-blue-400 focus:scale-105"
               />
             </div>
-            <button type="button" onClick={fetchHotels} className="btn-secondary whitespace-nowrap">
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="group">
               <label className="mb-2 block text-sm font-semibold text-slate-700">Location</label>
               <input
                 type="text"
@@ -139,25 +157,45 @@ const HomePage = () => {
                 value={filters.location}
                 onChange={handleFilterChange}
                 placeholder="Enter location"
-                className="input-field"
+                className="input-field transition-all duration-200 hover:bg-white focus:ring-2 focus:ring-blue-400"
               />
             </div>
-            <div>
+            <div className="group">
               <label className="mb-2 block text-sm font-semibold text-slate-700">Price range</label>
-              <select name="priceRange" value={filters.priceRange} onChange={handleFilterChange} className="input-field">
+              <select
+                name="priceRange"
+                value={filters.priceRange}
+                onChange={handleFilterChange}
+                className="input-field transition-all duration-200 hover:bg-white focus:ring-2 focus:ring-blue-400"
+              >
                 <option value="all">All prices</option>
                 <option value="budget">Budget (Under $100)</option>
                 <option value="mid">Mid-range ($100-$250)</option>
                 <option value="luxury">Luxury ($250+)</option>
               </select>
             </div>
-            <div>
+            <div className="group">
               <label className="mb-2 block text-sm font-semibold text-slate-700">Rating</label>
-              <select name="rating" value={filters.rating} onChange={handleFilterChange} className="input-field">
+              <select
+                name="rating"
+                value={filters.rating}
+                onChange={handleFilterChange}
+                className="input-field transition-all duration-200 hover:bg-white focus:ring-2 focus:ring-blue-400"
+              >
                 <option value="all">All ratings</option>
                 <option value="3+">3+ stars</option>
                 <option value="4+">4+ stars</option>
               </select>
+            </div>
+            <div className="flex items-end gap-2">
+              <button
+                type="button"
+                onClick={fetchHotels}
+                className="btn-secondary flex-1 whitespace-nowrap transition-all duration-200 hover:scale-105 active:scale-95"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </button>
             </div>
           </div>
         </section>

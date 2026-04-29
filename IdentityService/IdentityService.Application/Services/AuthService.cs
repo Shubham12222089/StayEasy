@@ -1,4 +1,4 @@
-﻿using IdentityService.Application.DTOs.Request;
+using IdentityService.Application.DTOs.Request;
 using IdentityService.Application.DTOs.Response;
 using IdentityService.Application.Events;
 using IdentityService.Application.Exceptions;
@@ -85,6 +85,7 @@ public class AuthService : IAuthService
         return new AuthResponse
         {
             Token = token,
+            FirstName = user.FirstName,
             Email = user.Email,
             Role = user.Role
         };
@@ -108,6 +109,7 @@ public class AuthService : IAuthService
         return new AuthResponse
         {
             Token = token,
+            FirstName = user.FirstName,
             Email = user.Email,
             Role = user.Role
         };

@@ -3,14 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom'
 import RoomCard from '../components/RoomCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Alert from '../components/Alert'
+import RatingStars from '../components/RatingStars'
 import { hotelService } from '../services/hotelService'
 import { useCart } from '../context/CartContext'
 import { MapPin, Star, Phone, MapPinned, ArrowLeft, CheckCircle2 } from '../components/ui-icons'
+import { useAuth } from '../context/AuthContext'
 
 const HotelDetailsPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { isAuthenticated } = useAuth()
   const [hotel, setHotel] = useState(null)
   const [rooms, setRooms] = useState([])
   const [loading, setLoading] = useState(true)
@@ -19,6 +22,7 @@ const HotelDetailsPage = () => {
   const [checkOutDate, setCheckOutDate] = useState('')
   const [addingToCart, setAddingToCart] = useState({})
   const [success, setSuccess] = useState('')
+  const [ratingLoading, setRatingLoading] = useState(false)
 
   useEffect(() => {
     fetchHotelDetails()
@@ -58,7 +62,58 @@ const HotelDetailsPage = () => {
     return Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)))
   }, [checkInDate, checkOutDate])
 
+  const totalAvailableRooms = useMemo(() => {
+    // First try to sum from individual rooms
+    const roomsSum = rooms.reduce((sum, room) => {
+      const available = Number(
+        room.availableCount ||
+        room.AvailableCount ||
+        room.availableRooms || 
+        room.AvailableRooms || 
+        room.available_rooms ||
+        room.totalRooms ||
+        room.TotalRooms ||
+        0
+      )
+      return sum + available
+    }, 0)
+    
+    // If rooms sum is available, return it
+    if (roomsSum > 0) {
+      return roomsSum
+    }
+    
+    // Fallback to hotel's available rooms field - try multiple variations
+    const hotelAvailable = Number(
+      hotel?.availableRooms || 
+      hotel?.AvailableRooms || 
+      hotel?.available_rooms ||
+      hotel?.totalRooms ||
+      hotel?.TotalRooms ||
+      hotel?.availableRoomsCount ||
+      0
+    )
+    
+    console.log('Debug - Hotel:', { 
+      hotelId: hotel?.id, 
+      hotelAvailable,
+      hotelKeys: hotel ? Object.keys(hotel) : [],
+      roomsCount: rooms.length,
+      roomsSample: rooms[0]
+    })
+    
+    return hotelAvailable
+  }, [rooms, hotel])
+
   const handleAddToCart = async (room) => {
+    if (!isAuthenticated) {
+      setError('Please log in to add rooms to your cart')
+      setTimeout(() => {
+        navigate('/login')
+      }, 1500)
+      return
+    }
+
     if (!checkInDate || !checkOutDate) {
       setError('Please select check-in and check-out dates')
       return
@@ -71,20 +126,42 @@ const HotelDetailsPage = () => {
 
     setAddingToCart((prev) => ({ ...prev, [room.id]: true }))
     try {
+      const roomName = room.name || room.Name || room.type || room.Type || room.roomType || 'Room'
       const roomData = {
         ...room,
         hotelId: hotel.id,
         hotelName: hotel.name,
-        name: room.name || room.roomType || 'Room',
-        price: room.pricePerNight ?? room.price ?? 0
+        name: roomName,
+        price: room.pricePerNight ?? room.price ?? room.Price ?? 0
       }
       addToCart(roomData, checkInDate, checkOutDate)
-      setSuccess(`${room.name || 'Room'} added to cart`)
+      setSuccess(`${roomName} added to cart`)
       window.setTimeout(() => setSuccess(''), 2500)
     } catch {
       setError('Failed to add room to cart')
     } finally {
       setAddingToCart((prev) => ({ ...prev, [room.id]: false }))
+    }
+  }
+
+  const handleSubmitRating = async (ratingValue) => {
+    if (!isAuthenticated) {
+      setError('Please log in to submit a rating')
+      return
+    }
+
+    setRatingLoading(true)
+    try {
+      await hotelService.submitRating(hotel.id, ratingValue)
+      const updatedHotel = await hotelService.getHotelById(hotel.id)
+      setHotel(updatedHotel)
+      setSuccess('Thank you! Your rating has been submitted.')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      setError('Failed to submit rating. Please try again.')
+      console.error(err)
+    } finally {
+      setRatingLoading(false)
     }
   }
 
@@ -124,14 +201,36 @@ const HotelDetailsPage = () => {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
               <div className="absolute bottom-5 left-5 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-800 backdrop-blur">
-                {rooms.length} rooms available
+                {totalAvailableRooms > 0 ? `${totalAvailableRooms} rooms available` : `${rooms.length} room type(s)`}
               </div>
             </div>
 
             <div className="p-6 sm:p-8">
-              <div className="mb-4 flex items-center gap-2 text-amber-600">
-                <Star className="h-5 w-5 fill-current" />
-                <span className="text-lg font-bold text-slate-900">{hotel.averageRating || 4.5}</span>
+              <div className="mb-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-700">Overall Rating</p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-4xl font-black text-amber-600">
+                      {Number(hotel.averageRating || hotel.rating || hotel.Rating || 0) > 0
+                        ? Number(hotel.averageRating || hotel.rating || hotel.Rating || 0).toFixed(1)
+                        : 'N/A'}
+                    </p>
+                    <p className="mt-1 text-sm text-amber-700">Based on guest ratings</p>
+                  </div>
+                  {isAuthenticated && (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Rate this hotel</p>
+                      <RatingStars
+                        rating={0}
+                        onRate={handleSubmitRating}
+                        interactive={true}
+                        size="lg"
+                        showValue={false}
+                        readOnly={ratingLoading}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">{hotel.name}</h1>
               <div className="mt-4 flex items-center gap-2 text-slate-600">
@@ -142,7 +241,7 @@ const HotelDetailsPage = () => {
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {hotel.phone && (
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-2xl bg-slate-50 p-4 transition-all duration-200 hover:shadow-md hover:bg-slate-100">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
                       <Phone className="h-4 w-4" />
                       Contact
@@ -151,7 +250,7 @@ const HotelDetailsPage = () => {
                   </div>
                 )}
                 {hotel.address && (
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-2xl bg-slate-50 p-4 transition-all duration-200 hover:shadow-md hover:bg-slate-100">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
                       <MapPinned className="h-4 w-4" />
                       Address
@@ -164,27 +263,41 @@ const HotelDetailsPage = () => {
           </div>
         </div>
 
-        <div className="card mb-8 p-6">
+        <div className="card mb-8 overflow-hidden border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
           <div className="mb-4 flex items-center gap-2 text-slate-900">
             <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-            <h2 className="text-2xl font-bold">Select dates</h2>
+            <h2 className="text-2xl font-bold">Select your dates</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Check-in</label>
-              <input type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className="input-field" />
+            <div className="group">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Check-in date</label>
+              <input
+                type="date"
+                value={checkInDate}
+                onChange={(e) => setCheckInDate(e.target.value)}
+                className="input-field transition-all duration-200 focus:ring-2 focus:ring-blue-400"
+              />
             </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Check-out</label>
-              <input type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} className="input-field" />
+            <div className="group">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Check-out date</label>
+              <input
+                type="date"
+                value={checkOutDate}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                className="input-field transition-all duration-200 focus:ring-2 focus:ring-blue-400"
+              />
             </div>
           </div>
-          <p className="mt-4 text-sm text-slate-500">Booking duration: <span className="font-semibold text-slate-900">{nights} night(s)</span></p>
+          <p className="mt-4 text-sm text-slate-600">
+            Booking duration: <span className="inline-flex rounded-full bg-blue-200 px-3 py-1 font-bold text-blue-700">{nights} night(s)</span>
+          </p>
         </div>
 
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-2xl font-bold text-slate-900">Available rooms</h2>
-          <span className="text-sm text-slate-500">Choose a room and add it to your cart</span>
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900">Available rooms</h2>
+            <p className="mt-1 text-slate-600">Select a room and add it to your cart</p>
+          </div>
         </div>
 
         {rooms.length > 0 ? (

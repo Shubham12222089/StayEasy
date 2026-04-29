@@ -10,5 +10,7 @@ public class HotelResponse
 
     public decimal PricePerNight { get; set; }
 
+    public decimal Rating { get; set; }
+
     public List<RoomResponse> Rooms { get; set; } = new();
 }

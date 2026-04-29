@@ -9,6 +9,7 @@ const emptyHotelForm = {
   location: '',
   description: '',
   pricePerNight: '',
+  rating: '',
   availableRooms: '',
 }
 
@@ -41,6 +42,7 @@ const AdminDashboardPage = () => {
   const getHotelName = (hotel) => hotel?.name || hotel?.Name || 'Hotel'
   const getHotelLocation = (hotel) => hotel?.location || hotel?.Location || ''
   const getHotelPrice = (hotel) => Number(hotel?.pricePerNight || hotel?.PricePerNight || 0)
+  const getHotelRating = (hotel) => Number(hotel?.rating || hotel?.Rating || 0)
   const getHotelDescription = (hotel) => hotel?.description || hotel?.Description || ''
   const getHotelRooms = (hotel) => Number(hotel?.availableRooms || hotel?.AvailableRooms || 0)
 
@@ -134,6 +136,7 @@ const AdminDashboardPage = () => {
         location: hotelForm.location,
         description: hotelForm.description,
         pricePerNight: Number(hotelForm.pricePerNight),
+        rating: Number(hotelForm.rating),
         availableRooms: Number(hotelForm.availableRooms),
       }
 
@@ -163,6 +166,7 @@ const AdminDashboardPage = () => {
       location: getHotelLocation(hotel),
       description: getHotelDescription(hotel),
       pricePerNight: String(getHotelPrice(hotel)),
+      rating: String(getHotelRating(hotel)),
       availableRooms: String(getHotelRooms(hotel)),
     })
   }
@@ -415,13 +419,24 @@ const AdminDashboardPage = () => {
                 onChange={(e) => setHotelForm((prev) => ({ ...prev, description: e.target.value }))}
                 required
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <input
                   type="number"
                   className="input-field"
                   placeholder="Price per night"
                   value={hotelForm.pricePerNight}
                   onChange={(e) => setHotelForm((prev) => ({ ...prev, pricePerNight: e.target.value }))}
+                  required
+                />
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  className="input-field"
+                  placeholder="Rating (0-5)"
+                  value={hotelForm.rating}
+                  onChange={(e) => setHotelForm((prev) => ({ ...prev, rating: e.target.value }))}
                   required
                 />
                 <input
@@ -460,6 +475,7 @@ const AdminDashboardPage = () => {
                       <th className="py-3 pr-4">Name</th>
                       <th className="py-3 pr-4">Location</th>
                       <th className="py-3 pr-4">Price</th>
+                      <th className="py-3 pr-4">Rating</th>
                       <th className="py-3 pr-4">Rooms</th>
                       <th className="py-3 pr-4">Actions</th>
                     </tr>
@@ -470,6 +486,7 @@ const AdminDashboardPage = () => {
                         <td className="py-3 pr-4 font-semibold text-slate-900">{getHotelName(hotel)}</td>
                         <td className="py-3 pr-4 text-slate-600">{getHotelLocation(hotel)}</td>
                         <td className="py-3 pr-4 text-slate-600">${getHotelPrice(hotel).toFixed(2)}</td>
+                        <td className="py-3 pr-4 text-slate-600">{getHotelRating(hotel).toFixed(1)}</td>
                         <td className="py-3 pr-4 text-slate-600">{getHotelRooms(hotel)}</td>
                         <td className="py-3 pr-4">
                           <div className="flex flex-wrap gap-2">

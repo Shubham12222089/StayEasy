@@ -9,4 +9,6 @@ public class HotelSummary
     public string Location { get; set; } = string.Empty;
 
     public decimal PricePerNight { get; set; }
+
+    public decimal Rating { get; set; }
 }

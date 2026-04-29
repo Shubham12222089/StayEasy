@@ -10,5 +10,7 @@ public class CreateHotelRequest
 
     public decimal PricePerNight { get; set; }
 
+    public decimal Rating { get; set; }
+
     public int AvailableRooms { get; set; }
 }

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -14,6 +15,7 @@ import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import BookingConfirmationPage from './pages/BookingConfirmationPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import MyBookingsPage from './pages/MyBookingsPage'
 
 function App() {
   return (
@@ -21,9 +23,9 @@ function App() {
       <Router>
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-screen bg-transparent">
+            <div className="flex min-h-screen flex-col bg-transparent">
               <Navbar />
-              <main>
+              <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<LoginPage />} />
@@ -40,6 +42,15 @@ function App() {
                   />
 
                   <Route
+                    path="/my-bookings"
+                    element={
+                      <ProtectedRoute>
+                        <MyBookingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
                     path="/checkout"
                     element={
                       <ProtectedRoute>
@@ -49,7 +60,7 @@ function App() {
                   />
 
                   <Route
-                    path="/booking-confirmation/:id"
+                    path="/booking-confirmation"
                     element={
                       <ProtectedRoute>
                         <BookingConfirmationPage />
@@ -69,6 +80,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
+              <Footer />
             </div>
           </CartProvider>
         </AuthProvider>
